@@ -185,9 +185,28 @@ sequenceDiagram
 ```
 
 ## 🛠 Tech Stack
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS v4, React-Leaflet, Recharts.
-- **Backend:** Python 3.10+, FastAPI, Uvicorn, LangGraph principles, LangChain (Google GenAI).
-- **APIs:** Open-Meteo, OpenWeatherMap, Gemini 3.1 Pro/2.0 Flash.
+
+**1. Frontend & Core Framework**
+- **Framework:** React + Vite
+- **Language:** TypeScript
+- **Global State Management:** React Hooks & Context
+- **Deployment:** Local / Vercel-ready
+
+**2. UI / UX & Visualization**
+- **Styling:** Tailwind CSS v4 (Custom Dark Ocean Glassmorphic Design Token System)
+- **Icons & Animations:** Native CSS Animations
+- **Data Visualization (Charts/Graphs):** Recharts
+- **Geospatial Mapping:** React Leaflet / Leaflet.js
+
+**3. Agentic AI & Intelligence**
+- **Orchestration Engine:** LangGraph-inspired State Machine
+- **AI Models:** Google Gemini (3.1 Pro / 2.0 Flash)
+- **Natural Language Interface:** Multilingual LLM Translation (Bengali, Hindi, English)
+
+**4. External Data Integrations (Feeds)**
+- **Oceanographic & Meteorological Data:** Open-Meteo Marine & Weather APIs
+- **Geospatial Data:** Mathematical Haversine geofencing & static coordinate bounding boxes
+- **Weather Validation Data:** OpenWeatherMap API
 
 ## 🏁 Getting Started
 ### Backend
