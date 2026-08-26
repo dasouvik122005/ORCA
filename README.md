@@ -27,39 +27,39 @@ graph TD
     classDef external fill:#0a0e27,stroke:#e94560,stroke-width:2px,color:#e2e8f0
     classDef engine fill:#334173,stroke:#f39c12,stroke-width:2px,color:#e2e8f0
 
-    subgraph Frontend [Client Layer (React + Vite)]
-        UI[Web Dashboard]:::frontend
-        Map[Leaflet Marine Map]:::frontend
-        Dash[Risk Dashboard]:::frontend
-        Trace[Real-time Reasoning Trace]:::frontend
+    subgraph Frontend ["Client Layer (React + Vite)"]
+        UI["Web Dashboard"]:::frontend
+        Map["Leaflet Marine Map"]:::frontend
+        Dash["Risk Dashboard"]:::frontend
+        Trace["Real-time Reasoning Trace"]:::frontend
     end
 
-    subgraph Backend [Intelligence Layer (FastAPI)]
-        Orchestrator{Orchestrator Agent<br/>Intent & Routing}:::engine
-        WS[WebSocket Manager<br/>Progress Streaming]:::backend
+    subgraph Backend ["Intelligence Layer (FastAPI)"]
+        Orchestrator{"Orchestrator Agent<br/>Intent & Routing"}:::engine
+        WS["WebSocket Manager<br/>Progress Streaming"]:::backend
         
-        subgraph Agents [Specialized Domain Agents]
-            Weather[Weather Agent]:::agent
-            Ocean[Ocean Agent]:::agent
-            Geo[Geospatial Agent]:::agent
-            PFZ[PFZ Discovery Agent]:::agent
-            Route[Route Planning Agent]:::agent
+        subgraph Agents ["Specialized Domain Agents"]
+            Weather["Weather Agent"]:::agent
+            Ocean["Ocean Agent"]:::agent
+            Geo["Geospatial Agent"]:::agent
+            PFZ["PFZ Discovery Agent"]:::agent
+            Route["Route Planning Agent"]:::agent
         end
         
-        Risk[Risk Assessment Agent<br/>Deterministic Engine]:::engine
-        Explain[Explainability Agent<br/>Gemini LLM]:::agent
+        Risk["Risk Assessment Agent<br/>Deterministic Engine"]:::engine
+        Explain["Explainability Agent<br/>Gemini LLM"]:::agent
     end
 
-    subgraph External [External APIs & Data]
-        OM[Open-Meteo API<br/>Marine & Weather]:::external
-        OWM[OpenWeatherMap API]:::external
-        Gemini[Google Gemini API]:::external
+    subgraph External ["External APIs & Data"]
+        OM["Open-Meteo API<br/>Marine & Weather"]:::external
+        OWM["OpenWeatherMap API"]:::external
+        Gemini["Google Gemini API"]:::external
     end
 
     %% Data Flow
-    UI -->|HTTP POST Query| Orchestrator
-    Orchestrator -.->|Agent Status Updates| WS
-    WS -.->|WebSocket Stream| Trace
+    UI -->|"HTTP POST Query"| Orchestrator
+    Orchestrator -.->|"Agent Status Updates"| WS
+    WS -.->|"WebSocket Stream"| Trace
     
     Orchestrator --> Weather
     Orchestrator --> Ocean
