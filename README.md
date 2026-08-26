@@ -4,6 +4,33 @@ An **Agentic AI-powered** marine decision intelligence platform that coordinates
 
 Built for the **Smart India Hackathon (SIH)**.
 
+---
+
+## 💡 IDEA / SOLUTION
+
+**Ask ORCA 🎤**
+Fishermen ask questions using voice or text in their local language.
+*Example: “Can I go fishing tomorrow?”*
+
+**Collect Ocean Data 🌊**
+ORCA collects information about weather, waves, tides, sea temperature, chlorophyll, cyclones and satellites.
+
+**AI Thinks Together 🤖**
+Different AI agents analyze the data to identify good fishing areas, dangerous areas and safe routes.
+
+**Give a Simple Answer ✅**
+ORCA converts all the complex analysis into a simple decision:
+- 🟢 **GO** – Safe/good conditions
+- 🔴 **AVOID** – Dangerous conditions
+- 🟡 **WAIT** – Conditions may improve later
+
+**Show & Warn 🗺️🔔**
+A map shows Potential Fishing Zones (PFZs), safe routes and danger zones. ORCA also sends voice/text alerts about cyclones, rough seas and other hazards.
+
+> **Ocean Data → AI Agents → Analyze → GO/AVOID/WAIT → Map + Alert**
+
+---
+
 ## 🚀 Features
 
 - **Agentic Orchestration:** A LangGraph-inspired state machine that delegates complex natural language queries to specialized agents.
