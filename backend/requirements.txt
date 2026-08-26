@@ -1,0 +1,13 @@
+# ORCA Backend Dependencies
+fastapi
+uvicorn[standard]
+websockets
+python-dotenv
+pydantic
+httpx
+langgraph
+langchain-google-genai
+langchain-core
+geopy
+shapely
+python-dateutil
