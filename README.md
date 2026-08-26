@@ -41,6 +41,24 @@ A map shows Potential Fishing Zones (PFZs), safe routes and danger zones. ORCA a
 
 ---
 
+## 🔬 Technical Approach
+
+Our solution moves away from the traditional, fragile "chatbot wrapper" by implementing a **Multi-Agent State Machine**. 
+
+1. **LangGraph-Inspired Orchestration:** 
+   Instead of relying on a single LLM to guess answers, we use a central Orchestrator that breaks down user queries (e.g., *"Is it safe near Digha?"*) and fans out execution to parallel, specialized domain agents (Weather, Ocean, PFZ, Geospatial).
+   
+2. **Deterministic Risk Engine (Zero Hallucinations):** 
+   LLMs are notoriously bad at math and safety-critical reasoning. To ensure fishermen's safety, ORCA uses a purely mathematical Risk Assessment Agent. It grades live oceanic data against hardcoded threshold matrices. For example, a wave height > 4.0 meters immediately triggers an *Extreme Risk (100)* score, bypassing AI unpredictability.
+
+3. **Live Marine Data Integration (Zero Mock Data):** 
+   The platform integrates with Open-Meteo Marine and OpenWeatherMap APIs, passing spatial coordinates directly to extract precise, real-time wind speed, swell height, sea surface temperature (SST), and precipitation probabilities.
+
+4. **Explainable AI (XAI) with Local Language Support:** 
+   Only *after* the deterministic Risk Engine calculates safety scores does the Explainability Agent (powered by Google Gemini) step in. It translates the raw JSON risk profile into easy-to-understand, empathetic advice in the user's native language (Bengali, Hindi, English).
+
+---
+
 ## 🧠 System Architecture
 
 ORCA is built on a decoupled, modular architecture that emphasizes specialized intelligence over a single monolithic LLM.
