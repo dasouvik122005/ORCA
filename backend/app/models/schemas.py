@@ -19,6 +19,7 @@ class Intent(str, Enum):
     ROUTE_PLANNING = "ROUTE_PLANNING"
     EXPLANATION = "EXPLANATION"
     GENERAL = "GENERAL"
+    HISTORICAL_ANALYSIS = "HISTORICAL_ANALYSIS"
 
 
 class RiskLevel(str, Enum):
@@ -194,6 +195,15 @@ class RouteReport(BaseModel):
     recommended_route_id: Optional[str] = None
 
 
+# --- Historical Report ---
+
+class HistoricalReport(BaseModel):
+    sst_trend_c: Optional[float] = None
+    historical_analysis_summary: str = ""
+    trend_data: list[dict] = Field(default_factory=list)
+    data_source: str = "agentic_analysis"
+
+
 # --- Full ORCA Response ---
 
 class OrcaResponse(BaseModel):
@@ -207,6 +217,7 @@ class OrcaResponse(BaseModel):
     pfz_report: Optional[PFZReport] = None
     geospatial_report: Optional[GeospatialReport] = None
     route_report: Optional[RouteReport] = None
+    historical_report: Optional[HistoricalReport] = None
     agent_traces: list[AgentTrace] = Field(default_factory=list)
     map_data: Optional[dict] = None
     conversation_id: str = ""

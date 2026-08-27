@@ -166,6 +166,13 @@ export interface MapData {
   routes: MapRoute[];
 }
 
+export interface HistoricalReport {
+  sst_trend_c?: number;
+  historical_analysis_summary: string;
+  trend_data: Array<{ year: number; sst_c: number; catch_index: number }>;
+  data_source: string;
+}
+
 export interface OrcaResponse {
   intent: Intent;
   language: Language;
@@ -177,6 +184,7 @@ export interface OrcaResponse {
   pfz_report?: PFZReport;
   geospatial_report?: Record<string, unknown>;
   route_report?: RouteReport;
+  historical_report?: HistoricalReport;
   agent_traces: AgentTrace[];
   map_data?: MapData;
   conversation_id: string;

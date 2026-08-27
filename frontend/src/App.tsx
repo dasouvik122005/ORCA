@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import { ChatPanel } from './components/ChatPanel';
 import { MarineMap } from './components/MarineMap';
 import { RiskDashboard } from './components/RiskDashboard';
+import { HistoricalDashboard } from './components/HistoricalDashboard';
 import { AgentTrace } from './components/AgentTrace';
 import { sendMessage, OrcaWebSocket } from './services/api';
 import type { ChatMessage, OrcaResponse, WSEvent, AgentTrace as AgentTraceType, Location } from './types';
@@ -174,11 +175,15 @@ function App() {
               </div>
             ) : null}
             <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar">
-              <RiskDashboard
-                riskScore={currentResponse?.risk_score || null}
-                weatherReport={currentResponse?.weather_report || null}
-                oceanReport={currentResponse?.ocean_report || null}
-              />
+              {currentResponse?.historical_report ? (
+                <HistoricalDashboard historicalReport={currentResponse.historical_report} />
+              ) : (
+                <RiskDashboard
+                  riskScore={currentResponse?.risk_score || null}
+                  weatherReport={currentResponse?.weather_report || null}
+                  oceanReport={currentResponse?.ocean_report || null}
+                />
+              )}
             </div>
           </div>
         </div>

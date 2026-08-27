@@ -17,6 +17,7 @@ from app.models.schemas import (
     AgentStatus,
     AgentTrace,
     GeospatialReport,
+    HistoricalReport,
     Intent,
     Language,
     OceanReport,
@@ -53,6 +54,7 @@ def _build_context(
     risk: RiskScore | None,
     geospatial: GeospatialReport | None,
     pfz: PFZReport | None,
+    historical: HistoricalReport | None = None,
     user_query: str = "",
 ) -> str:
     """Build a structured context string for the LLM from all agent findings."""
@@ -123,6 +125,11 @@ def _build_context(
             parts.append(f"  Reason: {z.reasoning}")
         parts.append("")
 
+    if historical:
+        parts.append("=== HISTORICAL TREND ANALYSIS ===")
+        parts.append(f"Analysis: {historical.historical_analysis_summary}")
+        parts.append("")
+
     return "\n".join(parts)
 
 
@@ -135,6 +142,7 @@ async def run_explainability_agent(
     risk: RiskScore | None = None,
     geospatial: GeospatialReport | None = None,
     pfz: PFZReport | None = None,
+    historical: HistoricalReport | None = None,
 ) -> tuple[str, str, AgentTrace]:
     """
     Execute Explainability Agent.
@@ -148,7 +156,7 @@ async def run_explainability_agent(
     )
 
     try:
-        context = _build_context(intent, weather, ocean, risk, geospatial, pfz, user_query)
+        context = _build_context(intent, weather, ocean, risk, geospatial, pfz, historical, user_query)
 
         lang_map = {"en": "English", "hi": "Hindi (Devanagari script)", "bn": "Bengali (বাংলা script)"}
         lang_name = lang_map.get(language.value, "English")
@@ -167,7 +175,7 @@ async def run_explainability_agent(
         if not GEMINI_API_KEY or GEMINI_API_KEY.startswith("your_"):
             # Fallback: generate explanation without LLM
             recommendation, explanation = _generate_fallback_explanation(
-                intent, language, risk, weather, ocean, geospatial, pfz
+                intent, language, risk, weather, ocean, geospatial, pfz, historical
             )
         else:
             llm = ChatGoogleGenerativeAI(
@@ -206,7 +214,7 @@ async def run_explainability_agent(
 
     except Exception as e:
         recommendation, explanation = _generate_fallback_explanation(
-            intent, language, risk, weather, ocean, geospatial, pfz
+            intent, language, risk, weather, ocean, geospatial, pfz, historical
         )
         trace.status = AgentStatus.COMPLETED
         trace.message = f"Fallback explanation generated (LLM unavailable: {str(e)})"
@@ -223,6 +231,7 @@ def _generate_fallback_explanation(
     ocean: OceanReport | None,
     geospatial: GeospatialReport | None,
     pfz: PFZReport | None,
+    historical: HistoricalReport | None = None,
 ) -> tuple[str, str]:
     """Generate structured explanation without LLM (fallback)."""
     if risk:
@@ -250,5 +259,8 @@ def _generate_fallback_explanation(
         parts.append(f"\n{risk.vessel_recommendation}")
 
         return rec, "\n".join(parts)
+
+    if historical:
+        return "Historical Analysis", historical.historical_analysis_summary
 
     return "⚠ Unable to assess", "Insufficient data for assessment."

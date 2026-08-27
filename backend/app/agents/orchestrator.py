@@ -22,6 +22,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 from app.agents.explainability_agent import run_explainability_agent
 from app.agents.geospatial_agent import run_geospatial_agent
+from app.agents.historical_agent import run_historical_agent
 from app.agents.ocean_agent import run_ocean_agent
 from app.agents.pfz_agent import run_pfz_agent
 from app.agents.risk_agent import run_risk_agent
@@ -44,7 +45,7 @@ _conversations: dict[str, list[dict]] = {}
 # Intent detection prompt
 INTENT_PROMPT = """You are ORCA's intent detection system. Analyze the user's message and extract:
 
-1. **intent**: One of: SAFETY_CHECK, PFZ_DISCOVERY, ROUTE_PLANNING, EXPLANATION, GENERAL
+1. **intent**: One of: SAFETY_CHECK, PFZ_DISCOVERY, ROUTE_PLANNING, EXPLANATION, HISTORICAL_ANALYSIS, GENERAL
 2. **language**: The language of the message — "en" (English), "hi" (Hindi), or "bn" (Bengali)
 3. **location_name**: Any location mentioned (harbor, city, coastal area). Return null if none.
 4. **target_time**: Any time reference ("tomorrow morning", "today evening", etc). Return null if none.
@@ -54,7 +55,8 @@ IMPORTANT:
 - SAFETY_CHECK: User asks if it's safe to go fishing/sailing/to sea
 - PFZ_DISCOVERY: User asks where to fish, nearest fishing zone, best fishing spot
 - ROUTE_PLANNING: User asks for safest route, how to reach, best path
-- EXPLANATION: User asks why something happened (fish decline, conditions change)
+- EXPLANATION: User asks why something happened immediately
+- HISTORICAL_ANALYSIS: User asks why fish productivity declined, or about historical environmental trends
 - GENERAL: Greetings, about ORCA, or unrelated
 
 Respond ONLY with valid JSON, no markdown:
@@ -186,7 +188,8 @@ def _rule_based_intent(message: str) -> dict:
     safety_keywords = ["safe", "safety", "danger", "risk", "go fishing", "venture", "নিরাপদ", "সমুদ্র", "সুরক্ষিত", "सुरक्षित", "मछली"]
     pfz_keywords = ["fishing zone", "where to fish", "pfz", "fishing spot", "মাছ ধরা", "मछली पकड़"]
     route_keywords = ["route", "path", "reach", "navigate", "safest way", "পথ", "रास्ता"]
-    explain_keywords = ["why", "reason", "decline", "কেন", "क्यों", "explain"]
+    historical_keywords = ["decline", "productivity", "history", "past", "years", "trend", "কমেছে", "পতন", "गिरावट"]
+    explain_keywords = ["why", "reason", "কেন", "क्यों", "explain"]
 
     if any(k in msg for k in safety_keywords):
         intent = "SAFETY_CHECK"
@@ -194,6 +197,8 @@ def _rule_based_intent(message: str) -> dict:
         intent = "PFZ_DISCOVERY"
     elif any(k in msg for k in route_keywords):
         intent = "ROUTE_PLANNING"
+    elif any(k in msg for k in historical_keywords):
+        intent = "HISTORICAL_ANALYSIS"
     elif any(k in msg for k in explain_keywords):
         intent = "EXPLANATION"
 
@@ -279,6 +284,7 @@ async def process_query(query: UserQuery, progress_callback=None) -> OrcaRespons
     geospatial_report = None
     risk_result = None
     route_report = None
+    historical_report = None
 
     if intent in (Intent.SAFETY_CHECK, Intent.GENERAL, Intent.EXPLANATION):
         # Safety check: Weather + Ocean + Geospatial → Risk → Explain
@@ -377,6 +383,19 @@ async def process_query(query: UserQuery, progress_callback=None) -> OrcaRespons
         agent_traces.append(risk_trace)
         await _emit("Risk Agent", "completed", risk_trace.message)
 
+    elif intent == Intent.HISTORICAL_ANALYSIS:
+        await _emit("Historical Agent", "running", "Researching long-term environmental trends...")
+        await _emit("Ocean Agent", "running", "Fetching current baseline data...")
+
+        hist_task = run_historical_agent(lat, lng, location_name, query.message)
+        ocean_task = run_ocean_agent(lat, lng, target_time)
+
+        (historical_report, hist_trace), (ocean_report, ocean_trace) = await asyncio.gather(hist_task, ocean_task)
+        agent_traces.extend([hist_trace, ocean_trace])
+
+        await _emit("Historical Agent", "completed", hist_trace.message)
+        await _emit("Ocean Agent", "completed", ocean_trace.message)
+
     # Step 3: Explainability Agent
     await _emit("Explainability Agent", "running", f"Generating explanation in {language.value}...")
     recommendation, explanation, explain_trace = await run_explainability_agent(
@@ -388,6 +407,7 @@ async def process_query(query: UserQuery, progress_callback=None) -> OrcaRespons
         risk=risk_result,
         geospatial=geospatial_report,
         pfz=pfz_report,
+        historical=historical_report,
     )
     agent_traces.append(explain_trace)
     await _emit("Explainability Agent", "completed", explain_trace.message)
@@ -420,6 +440,7 @@ async def process_query(query: UserQuery, progress_callback=None) -> OrcaRespons
         pfz_report=pfz_report,
         geospatial_report=geospatial_report,
         route_report=route_report,
+        historical_report=historical_report,
         agent_traces=agent_traces,
         map_data=map_data,
         conversation_id=conversation_id,
