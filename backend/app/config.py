@@ -20,7 +20,7 @@ OPENWEATHERMAP_ONECALL_URL = "https://api.openweathermap.org/data/3.0/onecall"
 OPENWEATHERMAP_WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
 
 # --- LLM Configuration ---
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = "gemini-1.5-flash"
 
 # --- Risk Engine Thresholds (based on IMD/INCOIS guidelines) ---
 RISK_THRESHOLDS = {
